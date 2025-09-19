@@ -27,9 +27,12 @@ def index():
 
 
 @app.route("/restaurants", methods=["GET"])
-def get_endpoint():
-    restaurants = [r.to_dict() for r in Restaurant.query.all()]
-    return jsonify(restaurants), 200
+def get_restaurants():
+    restaurants = Restaurant.query.all()
+    return jsonify([
+        {"id": r.id, "name": r.name, "address": r.address}
+        for r in restaurants
+    ]), 200
 
 
 @app.route("/restaurants/<int:id>", methods=["GET", "DELETE"])
@@ -42,7 +45,7 @@ def restaurant_by_id(id):
     if request.method == "GET":
         return jsonify(restaurant.to_dict()), 200
 
-    elif request.method == ["DELETE"]:
+    elif request.method == "DELETE":
         db.session.delete(restaurant)
         db.session.commit()
 
@@ -51,9 +54,20 @@ def restaurant_by_id(id):
 
 @app.route("/pizzas", methods=["GET"])
 def get_pizzas():
-    pizzas = [p.to_dict for p in Pizza.query.all()]
+    pizzas = Pizza.query.all()
 
-    return jsonify(pizzas), 200
+    result = [
+        {
+            "id": p.id,
+            "ingredients": p.ingredients,
+            "name": p.name
+
+        }
+        for p in pizzas
+    ]
+
+
+    return jsonify(result), 200
 
 
 @app.route("/restaurant_pizzas", methods=["POST"])
@@ -67,8 +81,8 @@ def add_pizza():
     if price is None or pizza_id is None or restaurant_id is None:
         return jsonify({"errors": ["price, pizza_id, and restaurant_id are required"]}), 404
 
-    pizza = Pizza.query.get(pizza_id)
-    restaurant = Restaurant.query.get(restaurant_id)
+    pizza = db.session.get(Pizza, pizza_id)
+    restaurant = db.session.get(Restaurant, restaurant_id)
 
     if not pizza or not restaurant:
         return jsonify({"error": "Pizza or restaurant not found"}), 404
