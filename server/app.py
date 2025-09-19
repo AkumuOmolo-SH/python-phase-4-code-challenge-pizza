@@ -45,7 +45,18 @@ def restaurant_by_id(id):
     elif request.method == "DELETE":
         db.session.delete(restaurant)
         db.session.commit()
-        return jsonify({"message": "Restaurant deleted"}), 200
+
+        return '', 204
+    
+@app.route("/pizzas", methods="GET")
+def get_pizzas():
+    pizzas = [p.to_dict for p in Pizza.query.all()]
+
+    return jsonify(pizzas), 200
+
+
+    
+    
 
 
 if __name__ == "__main__":
