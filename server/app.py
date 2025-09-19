@@ -24,6 +24,16 @@ api = Api(app)
 def index():
     return "<h1>Code challenge</h1>"
 
+@app.route("/restaurants", method = ["GET"])
+def get_endpoint():
+    restaurants = [r.to_dict() for r in Restaurant.query.all()]
+    return jsonify(restaurants), 200
+
+
+
+    
+
+
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
